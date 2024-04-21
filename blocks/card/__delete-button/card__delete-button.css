@@ -18,6 +18,11 @@
   transition: 0.3s;
 }
 
+.card__delete-button_invisible {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .card__delete-button:hover {
   opacity: 0.6;
 }
