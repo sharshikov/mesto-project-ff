@@ -1,4 +1,3 @@
-import { openModal } from "./modal";
 import { addLike, deleteLike } from './api.js';
 const userTemplate = document.querySelector('#card-template').content;
 export const cardsContainer = document.querySelector('.places__list');
@@ -16,11 +15,15 @@ export function createCard(card, deleteCard, clickByImage, userId) {
         cardElement.querySelector('.card__delete-button').classList.add('card__delete-button_invisible');
     }
     const cardLikeButton = cardElement.querySelector('.card__like-button');
-    if (card.likes.includes(userId)) {
-
-    }
     const likeCount = cardElement.querySelector('.count_likes');
-    likeCount.textContent = card.likes.length;
+    if (card.likes !== undefined) {
+        if (card.likes.includes(userId)) {
+            cardLikeButton.classList.add('card__like-button_is-active');
+        }
+        likeCount.textContent = card.likes.length;
+    } else {
+        likeCount.textContent = 0;
+    }
     cardLikeButton.addEventListener('click', () => {
         handleLike(card._id, cardLikeButton, likeCount)
     });
@@ -40,11 +43,16 @@ function handleLike(id, cardLikeButton, likeCount) {
                 cardLikeButton.classList.remove('card__like-button_is-active');
                 likeCount.textContent = data.likes.length;
             })
+            .catch((err) => {
+                console.log(`Ошибка: ${err}`)
+            });
     } else {
         addLike(id)
             .then(data => {
                 cardLikeButton.classList.add('card__like-button_is-active');
                 likeCount.textContent = data.likes.length;
-            })
+            }).catch((err) => {
+                console.log(`Ошибка: ${err}`)
+            });
     }
 }

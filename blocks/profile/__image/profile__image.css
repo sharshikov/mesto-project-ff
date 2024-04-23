@@ -7,7 +7,17 @@
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
-  object-fit:cover;
+  object-fit: cover;
+  display: flex;
+  justify-content: center;
+}
+
+.profile__image:hover {
+  opacity: 80%;
+}
+
+.avatar_edit {
+  width: 25%;
 }
 
 @media screen and (max-width: 740px) {

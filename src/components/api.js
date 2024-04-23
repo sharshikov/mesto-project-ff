@@ -13,7 +13,7 @@ export function getInitialCards() {
         headers: config.headers
     })
         .then(res => {
-            return res.json();
+            return checkResponse(res);
         });
 }
 
@@ -22,7 +22,7 @@ export function getUserInfo() {
         headers: config.headers
     })
         .then(res => {
-            return res.json();
+            return checkResponse(res);
         });
 }
 
@@ -34,6 +34,8 @@ export function setUserInfo(name, about) {
             name: name,
             about: about
         })
+    }).then(res => {
+        return checkResponse(res);
     });
 }
 
@@ -45,6 +47,8 @@ export function newCard(name, link) {
             name: name,
             link: link
         })
+    }).then(res => {
+        return checkResponse(res);
     });
 }
 
@@ -53,7 +57,7 @@ export function addLike(cardId) {
         method: 'PUT',
         headers: config.headers
     }).then(res => {
-        return res.json();
+        return checkResponse(res);
     });
 }
 
@@ -62,8 +66,8 @@ export function deleteLike(cardId) {
         method: 'DELETE',
         headers: config.headers
     }).then(res => {
-        return res.json();
-    });
+        return checkResponse(res);
+    })
 }
 
 export function changeAvatar(name, about) {
@@ -74,5 +78,15 @@ export function changeAvatar(name, about) {
             name: name,
             about: about
         })
+    }).then(res => {
+        return checkResponse(res);
     });
+}
+
+function checkResponse(res) {
+    if (res.ok) {
+        return res.json();
+    } else {
+        return Promise.reject(`Ошибка: ${res.status}`);
+    }
 }
