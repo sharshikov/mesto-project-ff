@@ -1,6 +1,6 @@
 import './index.css';
 import { enableValidation, clearValidation } from './components/validation.js';
-import { getInitialCards, getUserInfo, setUserInfo, newCard } from './components/api.js';
+import { getInitialCards, getUserInfo, setUserInfo, newCard, changeAvatar } from './components/api.js';
 import { openModal, closeModal } from './components/modal.js';
 import { createCard, deleteCard, cardsContainer } from './components/card.js';
 import { renderLoading } from './components/utils.js';
@@ -121,15 +121,16 @@ newCardButton.addEventListener('click', function () {
 })
 
 
-
 function newCardSubmit(evt) {
     evt.preventDefault();
-    renderLoading(true, submitCard)
+    renderLoading(true, submitCard);
     const name = inputCardName.value;
     const url = inputCardUrl.value;
-    const card = { name: name, link: url, _id: userId };
-    cardsContainer.prepend(createCard(card, deleteCard, clickByImage, userId));
-    newCard(card.name, card.link)
+    newCard(name, url)
+        .then((dataCard) => {
+            const card = { name: name, link: url, _id: dataCard._id, owner: { _id: userId } };
+            cardsContainer.prepend(createCard(card, deleteCard, clickByImage, userId));
+        })
         .catch((err) => {
             console.error(`Ошибка: ${err}`);
         })
@@ -137,7 +138,6 @@ function newCardSubmit(evt) {
             renderLoading(false, submitCard);
         }
         );
-
     inputCardName.value = '';
     inputCardUrl.value = '';
     closeModal(popupNewCard);
@@ -151,8 +151,8 @@ function clickByImage(event) {
         const image = document.querySelector('.popup__image');
         const cardImage = event.target;
         image.src = cardImage.src;
-        image.alt = cardImage.name;
-        popupImage.querySelector('.popup__caption').textContent = event.currentTarget.name;
+        image.alt = cardImage.alt;
+        popupImage.querySelector('.popup__caption').textContent = cardImage.alt;
         openModal(popupImage);
         enableValidation({
             formSelector: '.popup__form',
@@ -183,6 +183,7 @@ function newAvatarSubmit(evt) {
     evt.preventDefault();
     const url = newAvatarForm.querySelector('.popup__input_type_url').value;
     profileImage.style.backgroundImage = `url('${url}')`;
+    changeAvatar(url);
     closeModal(popupChangeAvatar);
 }
 

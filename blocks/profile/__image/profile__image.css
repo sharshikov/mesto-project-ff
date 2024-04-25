@@ -16,8 +16,13 @@
   opacity: 80%;
 }
 
+.profile__image:hover .avatar_edit{
+  visibility: visible;
+}
+
 .avatar_edit {
   width: 25%;
+  visibility: hidden;
 }
 
 @media screen and (max-width: 740px) {

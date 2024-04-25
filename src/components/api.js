@@ -52,6 +52,15 @@ export function newCard(name, link) {
     });
 }
 
+export function removeCard(cardId) {
+    return fetch(`${config['baseUrl']}/cards/${cardId}`, {
+        method: 'DELETE',
+        headers: config.headers
+    }).then(res => {
+        return checkResponse(res);
+    })
+}
+
 export function addLike(cardId) {
     return fetch(`${config['baseUrl']}/cards/likes/${cardId}`, {
         method: 'PUT',
@@ -70,13 +79,12 @@ export function deleteLike(cardId) {
     })
 }
 
-export function changeAvatar(name, about) {
-    return fetch(`${config['baseUrl']}/users/me/${avatar}`, {
+export function changeAvatar(link) {
+    return fetch(`${config['baseUrl']}/users/me/avatar`, {
         method: 'PATCH',
         headers: config.headers,
         body: JSON.stringify({
-            name: name,
-            about: about
+            avatar: link
         })
     }).then(res => {
         return checkResponse(res);
