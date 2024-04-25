@@ -105,8 +105,6 @@ function newCardSubmit(evt) {
         .then((dataCard) => {
             const card = { name: name, link: url, _id: dataCard._id, owner: { _id: userId } };
             cardsContainer.prepend(createCard(card, deleteCard, clickByImage, userId));
-            inputCardName.value = '';
-            inputCardUrl.value = '';
             closeModal(popupNewCard);
         })
         .catch((err) => {
