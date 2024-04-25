@@ -4,15 +4,16 @@ export const cardsContainer = document.querySelector('.places__list');
 export function createCard(card, deleteCard, clickByImage, userId) {
     const cardElement = userTemplate.querySelector('.card').cloneNode(true);
     const cardImage = cardElement.querySelector('.card__image')
+    const cardDeleteButton = cardElement.querySelector('.card__delete-button')
     cardImage.src = card.link;
     cardImage.alt = card.name;
     cardElement.querySelector('.card__title').textContent = card.name;
     if (card.owner._id === userId) {
-        cardElement.querySelector('.card__delete-button').addEventListener('click', function () {
+        cardDeleteButton.addEventListener('click', function () {
             deleteCard(cardElement, card._id);
         });
     } else {
-        cardElement.querySelector('.card__delete-button').classList.add('card__delete-button_invisible');
+        cardDeleteButton.classList.add('card__delete-button_invisible');
     }
     const cardLikeButton = cardElement.querySelector('.card__like-button');
     const likeCount = cardElement.querySelector('.count_likes');
@@ -29,13 +30,20 @@ export function createCard(card, deleteCard, clickByImage, userId) {
     cardLikeButton.addEventListener('click', () => {
         handleLike(card._id, cardLikeButton, likeCount)
     });
-    cardElement.addEventListener('click', clickByImage);
+
+    cardImage.addEventListener('click', clickByImage);
     return cardElement;
 }
 
 export function deleteCard(cardElement, id) {
-    removeCard(id);
-    cardElement.remove();
+    removeCard(id)
+        .then(() => {
+            cardElement.remove()
+        })
+        .catch((err) => {
+            console.log(`Ошибка: ${err}`)
+        });
+
 }
 
 function handleLike(id, cardLikeButton, likeCount) {

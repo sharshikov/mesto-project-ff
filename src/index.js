@@ -1,5 +1,5 @@
 import './index.css';
-import { enableValidation, clearValidation } from './components/validation.js';
+import { enableValidation} from './components/validation.js';
 import { getInitialCards, getUserInfo, setUserInfo, newCard, changeAvatar } from './components/api.js';
 import { openModal, closeModal } from './components/modal.js';
 import { createCard, deleteCard, cardsContainer } from './components/card.js';
@@ -19,15 +19,20 @@ const inputCardName = newCardForm.querySelector('.popup__input_type_card-name');
 const inputCardUrl = newCardForm.querySelector('.popup__input_type_url');
 const submitCard = newCardForm.querySelector('.popup__button');
 const submitProfile = popupEditProfile.querySelector('.popup__button');
-
-enableValidation({
+const closeButtons = document.querySelectorAll('.popup__close');
+const popupImage = document.querySelector('.popup_type_image');
+const image = document.querySelector('.popup__image');
+const caption = popupImage.querySelector('.popup__caption');
+export const validationConfig = {
     formSelector: '.popup__form',
     inputSelector: '.popup__input',
     submitButtonSelector: '.popup__button',
     inactiveButtonClass: 'popup__button_disabled',
     inputErrorClass: 'popup__input_type_error',
     errorClass: 'popup__error_visible'
-});
+};
+
+enableValidation(validationConfig);
 
 let userId = null;
 Promise.all([getInitialCards(), getUserInfo()])
@@ -45,20 +50,10 @@ Promise.all([getInitialCards(), getUserInfo()])
         console.error(`Ошибка: ${err}`);
     })
 
-document.querySelectorAll('.popup__close').forEach((item) => {
-    item.addEventListener('click', function () {
-        const popupOpened = document.querySelector('.popup_is-opened');
-        if (!popupOpened.classList.contains('popup_type_image')) {
-            clearValidation(popupEditProfile, {
-                inputSelector: '.popup__input',
-                submitButtonSelector: '.popup__button',
-                inactiveButtonClass: 'popup__button_disabled',
-                inputErrorClass: 'popup__input_type_error',
-                errorClass: 'popup__error_visible'
-            });
-        }
-        closeModal(popupOpened);
-    });
+
+closeButtons.forEach((button) => {
+    const popup = button.closest('.popup');
+    button.addEventListener('click', () => closeModal(popup));
 });
 
 function editPofileSubmit(evt) {
@@ -66,16 +61,12 @@ function editPofileSubmit(evt) {
     renderLoading(true, submitProfile);
     const nameInput = inputProfileName;
     const jobInput = inputProfileDescription;
-    profileTitle.textContent = nameInput.value;
-    profileDescription.textContent = jobInput.value;
-    clearValidation(popupEditProfile, {
-        inputSelector: '.popup__input',
-        submitButtonSelector: '.popup__button',
-        inactiveButtonClass: 'popup__button_disabled',
-        inputErrorClass: 'popup__input_type_error',
-        errorClass: 'popup__error_visible'
-    });
     setUserInfo(nameInput.value, jobInput.value)
+        .then(() => {
+            profileTitle.textContent = nameInput.value;
+            profileDescription.textContent = jobInput.value;
+            closeModal(popupEditProfile);
+        })
         .catch((err) => {
             console.error(`Ошибка: ${err}`);
         })
@@ -83,7 +74,6 @@ function editPofileSubmit(evt) {
             renderLoading(false, submitProfile);
         }
         );
-    closeModal(popupEditProfile);
 }
 
 popupEditProfile.addEventListener('submit', editPofileSubmit);
@@ -94,15 +84,7 @@ editButton.addEventListener('click', function () {
     inputProfileName.value = name;
     inputProfileDescription.value = description;
     openModal(popupEditProfile);
-    enableValidation({
-        formSelector: '.popup__form',
-        inputSelector: '.popup__input',
-        submitButtonSelector: '.popup__button',
-        inactiveButtonClass: 'popup__button_disabled',
-        inputErrorClass: 'popup__input_type_error',
-        errorClass: 'popup__error_visible'
-    });
-    getInitialCards();
+    enableValidation(validationConfig);
 });
 
 const newCardButton = document.querySelector('.profile__add-button');
@@ -111,13 +93,6 @@ newCardButton.addEventListener('click', function () {
     inputCardName.value = '';
     inputCardUrl.value = '';
     openModal(popupNewCard);
-    clearValidation(popupNewCard, {
-        inputSelector: '.popup__input',
-        submitButtonSelector: '.popup__button',
-        inactiveButtonClass: 'popup__button_disabled',
-        inputErrorClass: 'popup__input_type_error',
-        errorClass: 'popup__error_visible'
-    });
 })
 
 
@@ -130,6 +105,9 @@ function newCardSubmit(evt) {
         .then((dataCard) => {
             const card = { name: name, link: url, _id: dataCard._id, owner: { _id: userId } };
             cardsContainer.prepend(createCard(card, deleteCard, clickByImage, userId));
+            inputCardName.value = '';
+            inputCardUrl.value = '';
+            closeModal(popupNewCard);
         })
         .catch((err) => {
             console.error(`Ошибка: ${err}`);
@@ -138,53 +116,42 @@ function newCardSubmit(evt) {
             renderLoading(false, submitCard);
         }
         );
-    inputCardName.value = '';
-    inputCardUrl.value = '';
-    closeModal(popupNewCard);
 }
 
 newCardForm.addEventListener('submit', newCardSubmit);
 
 function clickByImage(event) {
-    if (event.target.classList.contains('card__image')) {
-        const popupImage = document.querySelector('.popup_type_image');
-        const image = document.querySelector('.popup__image');
-        const cardImage = event.target;
-        image.src = cardImage.src;
-        image.alt = cardImage.alt;
-        popupImage.querySelector('.popup__caption').textContent = cardImage.alt;
-        openModal(popupImage);
-        enableValidation({
-            formSelector: '.popup__form',
-            inputSelector: '.popup__input',
-            submitButtonSelector: '.popup__button',
-            inactiveButtonClass: 'popup__button_disabled',
-            inputErrorClass: 'popup__input_type_error',
-            errorClass: 'popup__error_visible'
-        });
-    }
+    const cardImage = event.target;
+    image.src = cardImage.src;
+    image.alt = cardImage.alt;
+    caption.textContent = cardImage.alt;
+    openModal(popupImage);
 }
 
 const changeAvatarButton = document.querySelector('.avatar_edit');
 const newAvatarForm = document.forms.change_avatar;
+const url = newAvatarForm.querySelector('.popup__input_type_url');
+const submitAvatar = newAvatarForm.querySelector('.popup__button');
 changeAvatarButton.addEventListener('click', function () {
+    url.value='';
     openModal(popupChangeAvatar);
-    enableValidation({
-        formSelector: '.popup__form',
-        inputSelector: '.popup__input',
-        submitButtonSelector: '.popup__button',
-        inactiveButtonClass: 'popup__button_disabled',
-        inputErrorClass: 'popup__input_type_error',
-        errorClass: 'popup__error_visible'
-    });
 })
 
 function newAvatarSubmit(evt) {
     evt.preventDefault();
-    const url = newAvatarForm.querySelector('.popup__input_type_url').value;
-    profileImage.style.backgroundImage = `url('${url}')`;
-    changeAvatar(url);
-    closeModal(popupChangeAvatar);
+    renderLoading(true, submitAvatar);
+    const urlValue = url.value;
+    changeAvatar(urlValue)
+        .then(() => {
+            closeModal(popupChangeAvatar);
+            profileImage.style.backgroundImage = `url('${urlValue}')`;
+        })
+        .catch((err) => {
+            console.error(`Ошибка: ${err}`);
+        })
+        .finally(() => {
+            renderLoading(false, submitAvatar);
+        })
 }
 
 newAvatarForm.addEventListener('submit', newAvatarSubmit);

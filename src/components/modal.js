@@ -1,4 +1,7 @@
+import { clearValidation } from './validation.js';
+import { validationConfig } from '../index.js';
 export function openModal(element) {
+    clearValidation(element, validationConfig)
     element.classList.add('popup_is-opened');
     document.addEventListener('keydown', closeModalByEscape)
     element.addEventListener('click', closeModalByOverlay)
@@ -18,6 +21,6 @@ function closeModalByEscape(evt) {
 
 function closeModalByOverlay(evt) {
     if (evt.target === evt.currentTarget) {
-        closeModal(document.querySelector('.popup_is-opened'));
+        closeModal(evt.currentTarget);
     }
 }
