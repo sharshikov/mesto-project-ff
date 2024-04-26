@@ -1,7 +1,4 @@
-import { clearValidation } from './validation.js';
-import { validationConfig } from '../index.js';
 export function openModal(element) {
-    clearValidation(element, validationConfig)
     element.classList.add('popup_is-opened');
     document.addEventListener('keydown', closeModalByEscape)
     element.addEventListener('click', closeModalByOverlay)

@@ -1,5 +1,5 @@
 import './index.css';
-import { enableValidation} from './components/validation.js';
+import { enableValidation, clearValidation } from './components/validation.js';
 import { getInitialCards, getUserInfo, setUserInfo, newCard, changeAvatar } from './components/api.js';
 import { openModal, closeModal } from './components/modal.js';
 import { createCard, deleteCard, cardsContainer } from './components/card.js';
@@ -59,12 +59,12 @@ closeButtons.forEach((button) => {
 function editPofileSubmit(evt) {
     evt.preventDefault();
     renderLoading(true, submitProfile);
-    const nameInput = inputProfileName;
-    const jobInput = inputProfileDescription;
-    setUserInfo(nameInput.value, jobInput.value)
+    const name = inputProfileName.value;
+    const job = inputProfileDescription.value;
+    setUserInfo(name, job)
         .then(() => {
-            profileTitle.textContent = nameInput.value;
-            profileDescription.textContent = jobInput.value;
+            profileTitle.textContent = name;
+            profileDescription.textContent = job;
             closeModal(popupEditProfile);
         })
         .catch((err) => {
@@ -84,14 +84,12 @@ editButton.addEventListener('click', function () {
     inputProfileName.value = name;
     inputProfileDescription.value = description;
     openModal(popupEditProfile);
-    enableValidation(validationConfig);
+    clearValidation(popupEditProfile, validationConfig);
 });
 
 const newCardButton = document.querySelector('.profile__add-button');
 
 newCardButton.addEventListener('click', function () {
-    inputCardName.value = '';
-    inputCardUrl.value = '';
     openModal(popupNewCard);
 })
 
@@ -106,6 +104,7 @@ function newCardSubmit(evt) {
             const card = { name: name, link: url, _id: dataCard._id, owner: { _id: userId } };
             cardsContainer.prepend(createCard(card, deleteCard, clickByImage, userId));
             closeModal(popupNewCard);
+            newCardForm.reset();
         })
         .catch((err) => {
             console.error(`Ошибка: ${err}`);
@@ -131,7 +130,6 @@ const newAvatarForm = document.forms.change_avatar;
 const url = newAvatarForm.querySelector('.popup__input_type_url');
 const submitAvatar = newAvatarForm.querySelector('.popup__button');
 changeAvatarButton.addEventListener('click', function () {
-    url.value='';
     openModal(popupChangeAvatar);
 })
 
@@ -143,6 +141,7 @@ function newAvatarSubmit(evt) {
         .then(() => {
             closeModal(popupChangeAvatar);
             profileImage.style.backgroundImage = `url('${urlValue}')`;
+            newAvatarForm.reset();
         })
         .catch((err) => {
             console.error(`Ошибка: ${err}`);

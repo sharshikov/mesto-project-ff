@@ -49,7 +49,7 @@ const setEventListeners = (formElement, obj) => {
     const buttonElement = formElement.querySelector(obj['submitButtonSelector']);
     toggleButtonState(inputList, buttonElement, obj);
     formElement.addEventListener('reset', () => {
-        disableButton(submitButton, settings)
+        disableButton(buttonElement, obj)
     });
     inputList.forEach((inputElement) => {
         inputElement.addEventListener('input', function () {
@@ -76,9 +76,7 @@ export const clearValidation = (formElement, validationConfig) => {
         hideInputError(formElement, inputElement, validationConfig);
         inputElement.setCustomValidity('');
     });
-    if (buttonElement !== null) {
-        disableButton(buttonElement, validationConfig);
-    }
+    disableButton(buttonElement, validationConfig);
 }
 
 function disableButton(buttonElement, settings) {
